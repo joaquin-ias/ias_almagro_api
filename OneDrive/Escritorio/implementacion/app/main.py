@@ -47,6 +47,10 @@ def eliminar_usuario(user_id):
     usuarios = [u for u in usuarios if u["id"] != user_id]
     return jsonify({"mensaje": "Usuario eliminado"})
 
+@app.route("/ping", methods=["GET"])
+def ping():
+    return jsonify({"mensaje": "pong"})
+
 if __name__ == "__main__":
     debug = os.getenv("DEBUG", "false").lower() == "true"
     app.run(debug=debug)
