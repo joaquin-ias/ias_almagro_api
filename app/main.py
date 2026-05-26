@@ -1,4 +1,4 @@
-# API de usuarios - IAS
+# API de usuarios - IAS Almagro
 
 import os
 from flask import Flask, jsonify, request
