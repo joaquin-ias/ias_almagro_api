@@ -51,9 +51,9 @@ def eliminar_usuario(user_id):
 def ping():
     return jsonify({"mensaje": "pong"})
 
-@app.route("/version", methods=["GET"])
-def version():
-    return jsonify({"version": "1.0", "autor": "Almagro"})
+#@app.route("/version", methods=["GET"])
+#def version():
+#    return jsonify({"version": "1.0", "autor": "Almagro"})
 
 if __name__ == "__main__":
     debug = os.getenv("DEBUG", "false").lower() == "true"
