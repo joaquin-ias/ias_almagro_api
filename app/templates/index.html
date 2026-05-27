@@ -1,253 +1,309 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestión de Usuarios</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f1f5f9;
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 60px 20px;
-    }
-
-    .container {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,.08);
-      padding: 40px;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-
-    .subtitle {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-bottom: 32px;
-    }
-
-    /* Formulario */
-    .form-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 32px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 11px 16px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      color: #0f172a;
-      background: #f8fafc;
-      outline: none;
-      transition: border-color .15s;
-    }
-
-    input[type="text"]:focus { border-color: #6366f1; background: #fff; }
-
-    button {
-      padding: 11px 22px;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .15s;
-    }
-
-    button:hover { background: #4f46e5; }
-
-    /* Tabla */
-    .table-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .table-title { font-size: 0.9rem; font-weight: 700; color: #0f172a; }
-    .count { font-size: 0.8rem; color: #94a3b8; }
-
-    table { width: 100%; border-collapse: collapse; }
-
-    thead th {
-      text-align: left;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: #94a3b8;
-      padding: 8px 12px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #fafafa; }
-
-    td { padding: 12px 12px; font-size: 0.9rem; color: #0f172a; }
-
-    .td-id { color: #94a3b8; font-size: 0.82rem; width: 50px; }
-
-    .btn-del {
-      padding: 5px 14px;
-      background: #fef2f2;
-      color: #ef4444;
-      border: 1px solid #fecaca;
-      border-radius: 7px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s;
-    }
-
-    .btn-del:hover { background: #fee2e2; }
-
-    .empty {
-      text-align: center;
-      padding: 40px 0;
-      color: #cbd5e1;
-      font-size: 0.88rem;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px; right: 24px;
-      background: #1e293b;
-      color: #f1f5f9;
-      padding: 11px 18px;
-      border-radius: 10px;
-      font-size: 0.83rem;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity .2s, transform .2s;
-      pointer-events: none;
-    }
-
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.ok  { border-left: 4px solid #22c55e; }
-    .toast.err { border-left: 4px solid #ef4444; }
-  </style>
-</head>
-<body>
-
-  <div class="container">
-    <h1>Gestión de Usuarios</h1>
-    <p class="subtitle">Agregá y administrá los usuarios del sistema.</p>
-
-    <div class="form-row">
-      <input type="text" id="input-nombre" placeholder="Nombre del usuario"
-             onkeydown="if(event.key==='Enter') agregar()" />
-      <button onclick="agregar()">Agregar</button>
-    </div>
-
-    <div class="table-header">
-      <span class="table-title">Usuarios</span>
-      <span class="count" id="count"></span>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-
-    <div class="empty" id="empty" style="display:none">No hay usuarios registrados.</div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script>
-    async function cargar() {
-      const res = await fetch('/usuarios');
-      const data = await res.json();
-
-      const tbody = document.getElementById('tbody');
-      const empty = document.getElementById('empty');
-      const count = document.getElementById('count');
-
-      count.textContent = data.length ? `${data.length} registro${data.length > 1 ? 's' : ''}` : '';
-
-      if (!data.length) {
-        tbody.innerHTML = '';
-        empty.style.display = 'block';
-        return;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Usuarios</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
-      empty.style.display = 'none';
-      tbody.innerHTML = data.map(u => `
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f1f5f9;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 60px 20px;
+      }
+
+      .container {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 40px;
+        width: 100%;
+        max-width: 600px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+      }
+
+      .subtitle {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin-bottom: 32px;
+      }
+
+      /* Formulario */
+      .form-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 32px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 11px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        color: #0f172a;
+        background: #f8fafc;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+
+      input[type="text"]:focus {
+        border-color: #6366f1;
+        background: #fff;
+      }
+
+      button {
+        padding: 11px 22px;
+        background: #6366f1;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s;
+      }
+
+      button:hover {
+        background: #4f46e5;
+      }
+
+      /* Tabla */
+      .table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .table-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .count {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead th {
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        padding: 8px 12px;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.1s;
+      }
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: #fafafa;
+      }
+
+      td {
+        padding: 12px 12px;
+        font-size: 0.9rem;
+        color: #0f172a;
+      }
+
+      .td-id {
+        color: #94a3b8;
+        font-size: 0.82rem;
+        width: 50px;
+      }
+
+      .btn-del {
+        padding: 5px 14px;
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        border-radius: 7px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .btn-del:hover {
+        background: #fee2e2;
+      }
+
+      .empty {
+        text-align: center;
+        padding: 40px 0;
+        color: #cbd5e1;
+        font-size: 0.88rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #1e293b;
+        color: #f1f5f9;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-size: 0.83rem;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+        pointer-events: none;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .toast.ok {
+        border-left: 4px solid #22c55e;
+      }
+      .toast.err {
+        border-left: 4px solid #ef4444;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Gestión de Usuarios- ALMAGRO</h1>
+      <p class="subtitle">Agregá y administrá los usuarios del sistema.</p>
+
+      <div class="form-row">
+        <input
+          type="text"
+          id="input-nombre"
+          placeholder="Nombre del usuario"
+          onkeydown="if (event.key === 'Enter') agregar();"
+        />
+        <button onclick="agregar()">Agregar</button>
+      </div>
+
+      <div class="table-header">
+        <span class="table-title">Usuarios</span>
+        <span class="count" id="count"></span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div class="empty" id="empty" style="display: none">
+        No hay usuarios registrados.
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      async function cargar() {
+        const res = await fetch("/usuarios");
+        const data = await res.json();
+
+        const tbody = document.getElementById("tbody");
+        const empty = document.getElementById("empty");
+        const count = document.getElementById("count");
+
+        count.textContent = data.length
+          ? `${data.length} registro${data.length > 1 ? "s" : ""}`
+          : "";
+
+        if (!data.length) {
+          tbody.innerHTML = "";
+          empty.style.display = "block";
+          return;
+        }
+
+        empty.style.display = "none";
+        tbody.innerHTML = data
+          .map(
+            (u) => `
         <tr>
           <td class="td-id">#${u.id}</td>
           <td>${u.nombre}</td>
           <td style="text-align:right">
             <button class="btn-del" onclick="eliminar(${u.id}, '${u.nombre}')">Eliminar</button>
           </td>
-        </tr>`).join('');
-    }
-
-    async function agregar() {
-      const input = document.getElementById('input-nombre');
-      const nombre = input.value.trim();
-      if (!nombre) return;
-
-      const res = await fetch('/usuarios', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre })
-      });
-
-      if (res.ok) {
-        input.value = '';
-        toast(`"${nombre}" agregado correctamente.`, 'ok');
-        cargar();
-      } else {
-        toast('No se pudo agregar el usuario.', 'err');
+        </tr>`,
+          )
+          .join("");
       }
-    }
 
-    async function eliminar(id, nombre) {
-      const res = await fetch(`/usuarios/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        toast(`"${nombre}" eliminado.`, 'ok');
-        cargar();
-      } else {
-        toast('No se pudo eliminar el usuario.', 'err');
+      async function agregar() {
+        const input = document.getElementById("input-nombre");
+        const nombre = input.value.trim();
+        if (!nombre) return;
+
+        const res = await fetch("/usuarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre }),
+        });
+
+        if (res.ok) {
+          input.value = "";
+          toast(`"${nombre}" agregado correctamente.`, "ok");
+          cargar();
+        } else {
+          toast("No se pudo agregar el usuario.", "err");
+        }
       }
-    }
 
-    function toast(msg, tipo) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${tipo} show`;
-      setTimeout(() => t.className = 'toast', 2800);
-    }
+      async function eliminar(id, nombre) {
+        const res = await fetch(`/usuarios/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          toast(`"${nombre}" eliminado.`, "ok");
+          cargar();
+        } else {
+          toast("No se pudo eliminar el usuario.", "err");
+        }
+      }
 
-    cargar();
-  </script>
+      function toast(msg, tipo) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = `toast ${tipo} show`;
+        setTimeout(() => (t.className = "toast"), 2800);
+      }
 
-</body>
+      cargar();
+    </script>
+  </body>
 </html>
