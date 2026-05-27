@@ -1,13 +1,18 @@
 # API de usuarios - IAS Almagro
 
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
 # "Base de datos" en memoria
 usuarios = []
 next_id = 1
+
+# Endpoint raíz: sirve el index
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
 
 # Endpoint 1: Healthcheck
 @app.route("/health", methods=["GET"])
@@ -51,9 +56,9 @@ def eliminar_usuario(user_id):
 def ping():
     return jsonify({"mensaje": "pong"})
 
-@app.route("/version", methods=["GET"])
-def version():
-    return jsonify({"version": "1.0", "autor": "Almagro"})
+#@app.route("/version", methods=["GET"])
+#def version():
+#    return jsonify({"version": "1.0", "autor": "Almagro"})
 
 if __name__ == "__main__":
     debug = os.getenv("DEBUG", "false").lower() == "true"
