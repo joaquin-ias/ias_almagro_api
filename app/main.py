@@ -1,13 +1,18 @@
 # API de usuarios - IAS Almagro
 
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
 # "Base de datos" en memoria
 usuarios = []
 next_id = 1
+
+# Endpoint raíz: sirve el index
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
 
 # Endpoint 1: Healthcheck
 @app.route("/health", methods=["GET"])
